@@ -12,7 +12,7 @@ func NewPage(title, spaceKey, content, parentID string) Page {
 		Body: Body{
 			Storage: Storage{
 				Value:          content,
-				Representation: "wiki",
+				Representation: "atlas_doc_format", // Changed from "wiki" to the ADF format
 			},
 		},
 	}

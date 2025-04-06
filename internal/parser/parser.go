@@ -2,8 +2,6 @@
 package parser
 
 import (
-	"fmt"
-
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/ast"
 	"github.com/yuin/goldmark/extension"
@@ -31,27 +29,16 @@ func NewMarkdownParser() *MarkdownParser {
 // Parse takes a markdown string and parses it into an AST
 func (mp *MarkdownParser) Parse(markdown string) ast.Node {
 	if len(markdown) == 0 {
-		fmt.Println("Debug: Markdown input is empty")
 		return nil
 	}
 
-	fmt.Printf("Debug: Markdown input size: %d bytes\n", len(markdown))
-
 	md := goldmark.New(
 		goldmark.WithExtensions(
-			extension.GFM, // GitHub Flavored Markdown
+			extension.GFM,
 		),
 		goldmark.WithParser(mp.parser),
 	)
 
 	reader := text.NewReader([]byte(markdown))
-	parsedNode := md.Parser().Parse(reader)
-
-	if parsedNode == nil {
-		fmt.Println("Debug: goldmark parser returned nil")
-	} else {
-		fmt.Println("Debug: goldmark parser successfully returned a node")
-	}
-
-	return parsedNode
+	return md.Parser().Parse(reader)
 }

@@ -9,7 +9,7 @@ import (
 
 func TestConvert(t *testing.T) {
 	t.Run("Empty input", func(t *testing.T) {
-		result, err := Convert("")
+		result, err := convert("")
 		assert.NoError(t, err)
 		assert.Equal(t, "", result)
 	})
@@ -48,14 +48,14 @@ func TestConvert(t *testing.T) {
 }`
 
 		// Mock dependencies if needed
-		result, err := Convert(mockMarkdown)
+		result, err := convert(mockMarkdown)
 		assert.NoError(t, err)
 		assert.JSONEq(t, mockResult, result)
 	})
 
 	t.Run("Invalid Markdown input", func(t *testing.T) {
 		mockMarkdown := "\x00Invalid Markdown"
-		result, err := Convert(mockMarkdown)
+		result, err := convert(mockMarkdown)
 		assert.Error(t, err)
 		assert.Equal(t, "", result)
 		assert.Contains(t, err.Error(), "Invalid Markdown")
@@ -65,7 +65,7 @@ func TestConvert(t *testing.T) {
 		mockMarkdown := "# Title\n" + string(make([]byte, 10000))
 		// Replace null characters with valid spaces
 		mockMarkdown = strings.ReplaceAll(mockMarkdown, "\x00", " ")
-		_, err := Convert(mockMarkdown)
+		_, err := convert(mockMarkdown)
 		assert.NoError(t, err)
 	})
 }

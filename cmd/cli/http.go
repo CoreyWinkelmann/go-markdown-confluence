@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"go-markdown-confluence/internal/confluence"
+	"go-markdown-confluence/pkg/markdownconfluence"
 	"net/http"
 	"time"
 )
@@ -105,3 +106,6 @@ func (c *ConfluenceClient) UpdatePage(pageID, title, content, spaceKey string, v
 
 	return nil
 }
+
+// Ensure ConfluenceClient implements the markdownconfluence.ConfluenceClient interface
+var _ markdownconfluence.ConfluenceClient = (*ConfluenceClient)(nil)
