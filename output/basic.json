@@ -1,0 +1,491 @@
+{
+  "type": "doc",
+  "content": [
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 1
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Basic Markdown"
+        },
+        {
+          "type": "text",
+          "text": " Examples"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "This document contains basic Markdown syntax"
+        },
+        {
+          "type": "text",
+          "text": " elements."
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 2
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Headers"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 3
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Level 3"
+        },
+        {
+          "type": "text",
+          "text": " Header"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 4
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Level 4"
+        },
+        {
+          "type": "text",
+          "text": " Header"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 5
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Level 5"
+        },
+        {
+          "type": "text",
+          "text": " Header"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 6
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Level 6"
+        },
+        {
+          "type": "text",
+          "text": " Header"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 2
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Text"
+        },
+        {
+          "type": "text",
+          "text": " Formatting"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "This text is italicized",
+          "marks": [
+            {
+              "type": "em"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "text": "This text is also italicized"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "This text is bold",
+          "marks": [
+            {
+              "type": "strong"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "text": "This text is also bold"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "This text is bold and italicized",
+          "marks": [
+            {
+              "type": "em"
+            },
+            {
+              "type": "strong"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "text": "This text is also bold and italicized"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "This text is strikethrough"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 2
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Lists"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 3
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Unordered"
+        },
+        {
+          "type": "text",
+          "text": " Lists"
+        }
+      ]
+    },
+    {
+      "type": "bulletList",
+      "attrs": {},
+      "content": [
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "text",
+              "text": "Item"
+            },
+            {
+              "type": "text",
+              "text": " 1"
+            }
+          ]
+        },
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "text",
+              "text": "Item"
+            },
+            {
+              "type": "text",
+              "text": " 2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "bulletList",
+      "attrs": {},
+      "content": [
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "text",
+              "text": "Nested Item"
+            },
+            {
+              "type": "text",
+              "text": " 1"
+            }
+          ]
+        },
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "text",
+              "text": "Nested Item"
+            },
+            {
+              "type": "text",
+              "text": " 2"
+            }
+          ]
+        },
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "text",
+              "text": "Item"
+            },
+            {
+              "type": "text",
+              "text": " 3"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 3
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Ordered"
+        },
+        {
+          "type": "text",
+          "text": " Lists"
+        }
+      ]
+    },
+    {
+      "type": "orderedList",
+      "attrs": {},
+      "content": [
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "text",
+              "text": "First"
+            },
+            {
+              "type": "text",
+              "text": " item"
+            }
+          ]
+        },
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "text",
+              "text": "Second"
+            },
+            {
+              "type": "text",
+              "text": " item"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "orderedList",
+      "attrs": {},
+      "content": [
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "text",
+              "text": "Nested item"
+            },
+            {
+              "type": "text",
+              "text": " 1"
+            }
+          ]
+        },
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "text",
+              "text": "Nested item"
+            },
+            {
+              "type": "text",
+              "text": " 2"
+            }
+          ]
+        },
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "text",
+              "text": "Third"
+            },
+            {
+              "type": "text",
+              "text": " item"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 2
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Blockquotes"
+        }
+      ]
+    },
+    {
+      "type": "blockquote",
+      "content": []
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "This is a"
+        },
+        {
+          "type": "text",
+          "text": " blockquote."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "It can span multiple"
+        },
+        {
+          "type": "text",
+          "text": " lines."
+        }
+      ]
+    },
+    {
+      "type": "blockquote",
+      "content": []
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Nested"
+        },
+        {
+          "type": "text",
+          "text": " blockquotes"
+        }
+      ]
+    },
+    {
+      "type": "blockquote",
+      "content": []
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Like this"
+        },
+        {
+          "type": "text",
+          "text": " one"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 2
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Horizontal"
+        },
+        {
+          "type": "text",
+          "text": " Rule"
+        }
+      ]
+    },
+    {
+      "type": "rule"
+    },
+    {
+      "type": "rule"
+    },
+    {
+      "type": "rule"
+    }
+  ]
+}

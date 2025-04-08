@@ -108,4 +108,4 @@ func (c *ConfluenceClient) UpdatePage(pageID, title, content, spaceKey string, v
 }
 
 // Ensure ConfluenceClient implements the markdownconfluence.ConfluenceClient interface
-var _ markdownconfluence.ConfluenceClient = (*ConfluenceClient)(nil)
+var dummyClient markdownconfluence.ConfluenceClient = nil

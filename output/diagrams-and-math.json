@@ -1,0 +1,333 @@
+{
+  "type": "doc",
+  "content": [
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 1
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Diagrams and Special Markdown"
+        },
+        {
+          "type": "text",
+          "text": " Features"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 2
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Mermaid"
+        },
+        {
+          "type": "text",
+          "text": " Diagrams"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "GitHub supports Mermaid diagrams in"
+        },
+        {
+          "type": "text",
+          "text": " markdown:"
+        }
+      ]
+    },
+    {
+      "type": "codeBlock",
+      "attrs": {
+        "language": "mermaid"
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "graph TD\n    A[Start] --\u003e B{Is it?}\n    B --\u003e|Yes| C[OK]\n    C --\u003e D[Rethink]\n    D --\u003e B\n    B ----\u003e|No| E[End]\n"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 3
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Sequence"
+        },
+        {
+          "type": "text",
+          "text": " Diagram"
+        }
+      ]
+    },
+    {
+      "type": "codeBlock",
+      "attrs": {
+        "language": "mermaid"
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "sequenceDiagram\n    participant Alice\n    participant Bob\n    Alice-\u003e\u003eJohn: Hello John, how are you?\n    loop Healthcheck\n        John-\u003e\u003eJohn: Fight against hypochondria\n    end\n    Note right of John: Rational thoughts \u003cbr/\u003eprevail!\n    John--\u003e\u003eAlice: Great!\n    John-\u003e\u003eBob: How about you?\n    Bob--\u003e\u003eJohn: Jolly good!\n"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 3
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Class"
+        },
+        {
+          "type": "text",
+          "text": " Diagram"
+        }
+      ]
+    },
+    {
+      "type": "codeBlock",
+      "attrs": {
+        "language": "mermaid"
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "classDiagram\n    Class01 \u003c|-- AveryLongClass : Cool\n    Class03 *-- Class04\n    Class05 o-- Class06\n    Class07 .. Class08\n    Class09 --\u003e C2 : Where am I?\n    Class09 --* C3\n    Class09 --|\u003e Class07\n    Class07 : equals()\n    Class07 : Object[] elementData\n    Class01 : size()\n    Class01 : int chimp\n    Class01 : int gorilla\n    Class08 \u003c--\u003e C2: Cool label\n"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 2
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Math"
+        },
+        {
+          "type": "text",
+          "text": " Expressions"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "GitHub also supports mathematical expressions using LaTeX"
+        },
+        {
+          "type": "text",
+          "text": " syntax:"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "When $a \\ne 0$, there are two solutions to $ax^2 + bx + c = 0$ and they"
+        },
+        {
+          "type": "text",
+          "text": " are"
+        },
+        {
+          "type": "text",
+          "text": "$$ x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}"
+        },
+        {
+          "type": "text",
+          "text": " $$"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Inline math:"
+        },
+        {
+          "type": "text",
+          "text": " $E=mc^2$"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 2
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "GitHub-specific"
+        },
+        {
+          "type": "text",
+          "text": " Features"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 3
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Internal Linking to"
+        },
+        {
+          "type": "text",
+          "text": " Headers"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "link",
+          "attrs": {
+            "href": "#math-expressions"
+          },
+          "content": []
+        },
+        {
+          "type": "text",
+          "text": "Link to the Math Expressions section"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 3
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Relative"
+        },
+        {
+          "type": "text",
+          "text": " Links"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "link",
+          "attrs": {
+            "href": "basic.md"
+          },
+          "content": []
+        },
+        {
+          "type": "text",
+          "text": "Link to the basic.md file"
+        },
+        {
+          "type": "link",
+          "attrs": {
+            "href": "code-and-links.md#code"
+          },
+          "content": []
+        },
+        {
+          "type": "text",
+          "text": "Link to the code examples"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 3
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Keyboard"
+        },
+        {
+          "type": "text",
+          "text": " Shortcuts"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Ctrl"
+        },
+        {
+          "type": "text",
+          "text": "+"
+        },
+        {
+          "type": "text",
+          "text": "C"
+        },
+        {
+          "type": "text",
+          "text": ":"
+        },
+        {
+          "type": "text",
+          "text": " Copy"
+        },
+        {
+          "type": "text",
+          "text": "Ctrl"
+        },
+        {
+          "type": "text",
+          "text": "+"
+        },
+        {
+          "type": "text",
+          "text": "V"
+        },
+        {
+          "type": "text",
+          "text": ":"
+        },
+        {
+          "type": "text",
+          "text": " Paste"
+        }
+      ]
+    }
+  ]
+}

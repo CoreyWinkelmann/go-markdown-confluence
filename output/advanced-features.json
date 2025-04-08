@@ -1,0 +1,468 @@
+{
+  "type": "doc",
+  "content": [
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 1
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Advanced Markdown"
+        },
+        {
+          "type": "text",
+          "text": " Features"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 2
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Footnotes"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Here is some text with a footnote reference["
+        },
+        {
+          "type": "text",
+          "text": "^1"
+        },
+        {
+          "type": "text",
+          "text": "]."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "["
+        },
+        {
+          "type": "text",
+          "text": "^1]: This is the footnote"
+        },
+        {
+          "type": "text",
+          "text": " content."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Multiple footnotes["
+        },
+        {
+          "type": "text",
+          "text": "^2]["
+        },
+        {
+          "type": "text",
+          "text": "^3] can be"
+        },
+        {
+          "type": "text",
+          "text": " used."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "["
+        },
+        {
+          "type": "text",
+          "text": "^2]: Second"
+        },
+        {
+          "type": "text",
+          "text": " footnote."
+        },
+        {
+          "type": "text",
+          "text": "["
+        },
+        {
+          "type": "text",
+          "text": "^3]: Third footnote with multiple"
+        },
+        {
+          "type": "text",
+          "text": " paragraphs."
+        }
+      ]
+    },
+    {
+      "type": "codeBlock",
+      "attrs": {},
+      "content": []
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 2
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Definition"
+        },
+        {
+          "type": "text",
+          "text": " Lists"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Term"
+        },
+        {
+          "type": "text",
+          "text": " 1"
+        },
+        {
+          "type": "text",
+          "text": ": Definition"
+        },
+        {
+          "type": "text",
+          "text": " 1"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Term"
+        },
+        {
+          "type": "text",
+          "text": " 2"
+        },
+        {
+          "type": "text",
+          "text": ": Definition"
+        },
+        {
+          "type": "text",
+          "text": " 2a"
+        },
+        {
+          "type": "text",
+          "text": ": Definition"
+        },
+        {
+          "type": "text",
+          "text": " 2b"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 2
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Emoji (GitHub"
+        },
+        {
+          "type": "text",
+          "text": " Supports)"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": ":smile: :rocket: :tada:"
+        },
+        {
+          "type": "text",
+          "text": " :octocat:"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 2
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Mention"
+        },
+        {
+          "type": "text",
+          "text": " Users"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "@username can be used to mention users on"
+        },
+        {
+          "type": "text",
+          "text": " GitHub."
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 2
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Issue"
+        },
+        {
+          "type": "text",
+          "text": " References"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "GitHub automatically links references to issues and pull requests:"
+        },
+        {
+          "type": "text",
+          "text": " #123"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 2
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Automatic linking for"
+        },
+        {
+          "type": "text",
+          "text": " URLs"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": " will be automatically converted to a"
+        },
+        {
+          "type": "text",
+          "text": " link."
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 2
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Collapsed"
+        },
+        {
+          "type": "text",
+          "text": " Sections"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 3
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Hidden Markdown"
+        },
+        {
+          "type": "text",
+          "text": " content"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "This content is hidden until the user clicks to expand"
+        },
+        {
+          "type": "text",
+          "text": " it."
+        }
+      ]
+    },
+    {
+      "type": "bulletList",
+      "attrs": {},
+      "content": [
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "text",
+              "text": "List item"
+            },
+            {
+              "type": "text",
+              "text": " 1"
+            }
+          ]
+        },
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "text",
+              "text": "List item"
+            },
+            {
+              "type": "text",
+              "text": " 2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 2
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "HTML in"
+        },
+        {
+          "type": "text",
+          "text": " Markdown"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Ctrl"
+        },
+        {
+          "type": "text",
+          "text": "+"
+        },
+        {
+          "type": "text",
+          "text": "Alt"
+        },
+        {
+          "type": "text",
+          "text": "+"
+        },
+        {
+          "type": "text",
+          "text": "Del"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 2
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Subscript and"
+        },
+        {
+          "type": "text",
+          "text": " Superscript"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "H"
+        },
+        {
+          "type": "text",
+          "text": "2"
+        },
+        {
+          "type": "text",
+          "text": "O"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "E = mc"
+        },
+        {
+          "type": "text",
+          "text": "2"
+        }
+      ]
+    }
+  ]
+}

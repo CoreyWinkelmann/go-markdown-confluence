@@ -1,0 +1,273 @@
+{
+  "type": "doc",
+  "content": [
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 1
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Links, Images, and Code"
+        },
+        {
+          "type": "text",
+          "text": " Examples"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 2
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Links"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "link",
+          "attrs": {
+            "href": "https://example.com"
+          },
+          "content": []
+        },
+        {
+          "type": "text",
+          "text": "Basic Link"
+        },
+        {
+          "type": "link",
+          "attrs": {
+            "href": "https://example.com"
+          },
+          "content": []
+        },
+        {
+          "type": "text",
+          "text": "Link with Title"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Reference-style link: ["
+        },
+        {
+          "type": "text",
+          "text": "Reference Link]["
+        },
+        {
+          "type": "text",
+          "text": "1"
+        },
+        {
+          "type": "text",
+          "text": "]"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "["
+        },
+        {
+          "type": "text",
+          "text": "1]: "
+        },
+        {
+          "type": "text",
+          "text": " \"Example"
+        },
+        {
+          "type": "text",
+          "text": " Reference\""
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Automatic URL linking: "
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 2
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Images"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "image",
+          "attrs": {
+            "src": "https://example.com/image.jpg"
+          }
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "!["
+        },
+        {
+          "type": "text",
+          "text": "Alt text with reference]["
+        },
+        {
+          "type": "text",
+          "text": "logo"
+        },
+        {
+          "type": "text",
+          "text": "]"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "["
+        },
+        {
+          "type": "text",
+          "text": "logo]: "
+        },
+        {
+          "type": "text",
+          "text": " \"Logo"
+        },
+        {
+          "type": "text",
+          "text": " Title\""
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 2
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Code"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Inline code: ",
+          "marks": [
+            {
+              "type": "code"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "text": "var example = \"hello world\";"
+        }
+      ]
+    },
+    {
+      "type": "codeBlock",
+      "attrs": {},
+      "content": [
+        {
+          "type": "text",
+          "text": "// Code block without syntax highlighting\nfunction helloWorld() {\n  console.log(\"Hello, world!\");\n}\n"
+        }
+      ]
+    },
+    {
+      "type": "codeBlock",
+      "attrs": {
+        "language": "javascript"
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "// JavaScript code with syntax highlighting\nfunction helloWorld() {\n  console.log(\"Hello, world!\");\n}\n"
+        }
+      ]
+    },
+    {
+      "type": "codeBlock",
+      "attrs": {
+        "language": "python"
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "# Python code with syntax highlighting\ndef hello_world():\n    print(\"Hello, world!\")\n"
+        }
+      ]
+    },
+    {
+      "type": "codeBlock",
+      "attrs": {
+        "language": "go"
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "// Go code with syntax highlighting\npackage main\n\nimport \"fmt\"\n\nfunc main() {\n    fmt.Println(\"Hello, world!\")\n}\n"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 2
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Indented Code"
+        },
+        {
+          "type": "text",
+          "text": " Blocks"
+        }
+      ]
+    },
+    {
+      "type": "codeBlock",
+      "attrs": {},
+      "content": []
+    }
+  ]
+}

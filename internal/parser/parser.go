@@ -26,7 +26,7 @@ func NewMarkdownParser() *MarkdownParser {
 	}
 }
 
-// Parse takes a markdown string and parses it into an AST
+// Remove debug logging for AST parsing
 func (mp *MarkdownParser) Parse(markdown string) ast.Node {
 	if len(markdown) == 0 {
 		return nil
@@ -40,5 +40,7 @@ func (mp *MarkdownParser) Parse(markdown string) ast.Node {
 	)
 
 	reader := text.NewReader([]byte(markdown))
-	return md.Parser().Parse(reader)
+	astRoot := md.Parser().Parse(reader)
+
+	return astRoot
 }

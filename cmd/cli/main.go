@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"go-markdown-confluence/internal/confluence"
 	"go-markdown-confluence/pkg/markdownconfluence"
 	"os"
 	"path/filepath"
@@ -16,6 +17,7 @@ func main() {
 	convertCmd := flag.NewFlagSet("convert", flag.ExitOnError)
 	convertInput := convertCmd.String("input", "", "Markdown input (file or string)")
 	convertOutput := convertCmd.String("output", "", "Output file (optional)")
+	convertDryRun := convertCmd.Bool("dry-run", false, "Skip Confluence upload and output JSON")
 
 	postCmd := flag.NewFlagSet("post", flag.ExitOnError)
 	postInput := postCmd.String("input", "", "Markdown input (file or string)")
@@ -33,7 +35,8 @@ func main() {
 	dirUsername := dirCmd.String("username", "", "Confluence username")
 	dirAPIToken := dirCmd.String("token", "", "Confluence API token")
 	dirSpaceKey := dirCmd.String("space", "", "Confluence space key (default: DOCS)")
-	dirDryRun := dirCmd.Bool("dry-run", false, "Simulate without uploading")
+	dirDryRun := dirCmd.Bool("dry-run", false, "Skip uploading to Confluence")
+	dirOutputDir := dirCmd.String("output-directory", "", "Directory to save converted JSON files (when using --dry-run)")
 
 	flag.Parse()
 
@@ -55,13 +58,13 @@ func main() {
 	switch os.Args[1] {
 	case "convert":
 		convertCmd.Parse(os.Args[2:])
-		handleConvert(*convertInput, *convertOutput)
+		handleConvert(*convertInput, *convertOutput, *convertDryRun)
 	case "post":
 		postCmd.Parse(os.Args[2:])
 		handlePost(*postInput, *postURL, *postUsername, *postAPIToken, *postSpaceKey, *postTitle, *postParentID)
 	case "directory":
 		dirCmd.Parse(os.Args[2:])
-		handleDirectory(*dirPath, *dirMapping, *dirURL, *dirUsername, *dirAPIToken, *dirSpaceKey, *dirDryRun)
+		handleDirectory(*dirPath, *dirMapping, *dirURL, *dirUsername, *dirAPIToken, *dirSpaceKey, *dirDryRun, *dirOutputDir)
 	case "help":
 		printHelp()
 	case "version":
@@ -73,15 +76,13 @@ func main() {
 	}
 }
 
-func handleConvert(input, output string) {
+func handleConvert(input, output string, dryRun bool) {
 	if input == "" {
 		fmt.Println("Error: No input specified")
 		return
 	}
 
 	var markdownContent string
-	var err error
-	var tempDir string
 	var tempFile string
 
 	if _, err := os.Stat(input); err == nil {
@@ -91,13 +92,22 @@ func handleConvert(input, output string) {
 			input: input,
 		}
 
-		err = markdownconfluence.ConvertDirectory(filepath.Dir(input), fileMapping, nil)
+		options := markdownconfluence.DefaultConvertOptions()
+		options.DryRun = true // Always dry run for convert command
+
+		// If output is specified, use it as the output directory
+		if output != "" {
+			options.OutputDirectory = filepath.Dir(output)
+		}
+
+		err = markdownconfluence.ConvertDirectoryWithOptions(filepath.Dir(input), fileMapping, nil, options, "DOCS")
 		if err != nil {
 			fmt.Printf("Error during conversion: %v\n", err)
 			return
 		}
 
-		if output != "" {
+		// If no output was specified but we want to display the result
+		if output == "" {
 			content, readErr := os.ReadFile(input)
 			if readErr != nil {
 				fmt.Printf("Error reading file: %v\n", readErr)
@@ -108,7 +118,7 @@ func handleConvert(input, output string) {
 	} else {
 		fmt.Println("Converting input string")
 
-		tempDir, err = os.MkdirTemp("", "markdown-convert")
+		tempDir, err := os.MkdirTemp("", "markdown-convert")
 		if err != nil {
 			fmt.Printf("Error creating temporary directory: %v\n", err)
 			return
@@ -125,9 +135,16 @@ func handleConvert(input, output string) {
 			tempFile: tempFile,
 		}
 
+		options := markdownconfluence.DefaultConvertOptions()
+		options.DryRun = true
+
+		if output != "" {
+			options.OutputDirectory = filepath.Dir(output)
+		}
+
 		outputCapturer := &OutputCapturer{}
 
-		err = markdownconfluence.ConvertDirectory(tempDir, fileMapping, outputCapturer)
+		err = markdownconfluence.ConvertDirectoryWithOptions(tempDir, fileMapping, outputCapturer, options, "DOCS")
 		if err != nil {
 			fmt.Printf("Error during conversion: %v\n", err)
 			return
@@ -136,73 +153,67 @@ func handleConvert(input, output string) {
 		markdownContent = outputCapturer.GetMarkdown()
 	}
 
-	if output != "" {
-		if markdownContent != "" {
-			dummyClient := &OutputCapturer{}
-
-			if tempFile == "" {
-				tempDir, err = os.MkdirTemp("", "markdown-convert")
-				if err != nil {
-					fmt.Printf("Error creating temporary directory: %v\n", err)
-					return
-				}
-				defer os.RemoveAll(tempDir)
-
-				tempFile = filepath.Join(tempDir, "input.md")
-				if err := os.WriteFile(tempFile, []byte(markdownContent), 0644); err != nil {
-					fmt.Printf("Error writing temporary file: %v\n", err)
-					return
-				}
-			}
-
-			fileMapping := map[string]string{
-				tempFile: tempFile,
-			}
-
-			err = markdownconfluence.ConvertDirectory(filepath.Dir(tempFile), fileMapping, dummyClient)
-			if err != nil {
-				fmt.Printf("Error during conversion: %v\n", err)
-				return
-			}
-
-			result := dummyClient.GetMarkdown()
-			if err := os.WriteFile(output, []byte(result), 0644); err != nil {
-				fmt.Printf("Error writing to output file: %v\n", err)
-				return
-			}
-			fmt.Printf("Conversion saved to: %s\n", output)
-		}
-	} else if markdownContent != "" {
-		fmt.Println("Converted Markdown:")
-
-		dummyClient := &OutputCapturer{}
-
-		tempDir, err = os.MkdirTemp("", "markdown-convert")
-		if err != nil {
-			fmt.Printf("Error creating temporary directory: %v\n", err)
-			return
-		}
-		defer os.RemoveAll(tempDir)
-
-		tempFile = filepath.Join(tempDir, "input.md")
-		if err := os.WriteFile(tempFile, []byte(markdownContent), 0644); err != nil {
-			fmt.Printf("Error writing temporary file: %v\n", err)
-			return
-		}
-
-		fileMapping := map[string]string{
-			tempFile: tempFile,
-		}
-
-		err = markdownconfluence.ConvertDirectory(filepath.Dir(tempFile), fileMapping, dummyClient)
+	// If output is specified but we haven't written to it yet
+	if output != "" && !dryRun {
+		result, err := convert(markdownContent)
 		if err != nil {
 			fmt.Printf("Error during conversion: %v\n", err)
 			return
 		}
 
-		result := dummyClient.GetMarkdown()
+		// If the output doesn't have a .json extension, add it
+		outputPath := output
+		if filepath.Ext(outputPath) != ".json" {
+			outputPath += ".json"
+		}
+
+		if err := os.WriteFile(outputPath, []byte(result), 0644); err != nil {
+			fmt.Printf("Error writing to output file: %v\n", err)
+			return
+		}
+		fmt.Printf("Conversion saved to: %s\n", outputPath)
+	} else if markdownContent != "" && !dryRun {
+		// Display the result if we're not using dry-run
+		result, err := convert(markdownContent)
+		if err != nil {
+			fmt.Printf("Error during conversion: %v\n", err)
+			return
+		}
+		fmt.Println("Converted Markdown to ADF JSON:")
 		fmt.Println(result)
 	}
+}
+
+func convert(markdownContent string) (string, error) {
+	if markdownContent == "" {
+		return "", nil
+	}
+
+	tempDir, err := os.MkdirTemp("", "markdown-convert-temp")
+	if err != nil {
+		return "", fmt.Errorf("error creating temporary directory: %w", err)
+	}
+	defer os.RemoveAll(tempDir)
+
+	tempFile := filepath.Join(tempDir, "input.md")
+	if err := os.WriteFile(tempFile, []byte(markdownContent), 0644); err != nil {
+		return "", fmt.Errorf("error writing temporary file: %w", err)
+	}
+
+	fileMapping := map[string]string{
+		tempFile: tempFile,
+	}
+
+	dummyClient := &OutputCapturer{}
+	options := markdownconfluence.DefaultConvertOptions()
+	options.DryRun = true
+
+	err = markdownconfluence.ConvertDirectoryWithOptions(tempDir, fileMapping, dummyClient, options, "DOCS")
+	if err != nil {
+		return "", fmt.Errorf("error during conversion: %w", err)
+	}
+
+	return dummyClient.GetMarkdown(), nil
 }
 
 func handlePost(input, confluenceURL, username, apiToken, spaceKey, title, parentID string) {
@@ -211,11 +222,9 @@ func handlePost(input, confluenceURL, username, apiToken, spaceKey, title, paren
 		return
 	}
 
-	var tempDir string
 	var tempFile string
-	var err error
 
-	client := NewConfluenceClient(confluenceURL, username, apiToken)
+	client := confluence.NewConfluenceClient(confluenceURL, username, apiToken)
 
 	if _, statErr := os.Stat(input); statErr == nil {
 		fmt.Printf("Converting and posting file: %s\n", input)
@@ -224,7 +233,10 @@ func handlePost(input, confluenceURL, username, apiToken, spaceKey, title, paren
 			input: title,
 		}
 
-		err = markdownconfluence.ConvertDirectory(filepath.Dir(input), fileMapping, client)
+		options := markdownconfluence.DefaultConvertOptions()
+		options.DefaultSpaceKey = spaceKey
+
+		err := markdownconfluence.ConvertDirectoryWithOptions(filepath.Dir(input), fileMapping, client, options, "DOCS")
 		if err != nil {
 			fmt.Printf("Error during conversion or posting: %v\n", err)
 			return
@@ -234,7 +246,7 @@ func handlePost(input, confluenceURL, username, apiToken, spaceKey, title, paren
 	} else {
 		fmt.Println("Converting and posting input string")
 
-		tempDir, err = os.MkdirTemp("", "markdown-post")
+		tempDir, err := os.MkdirTemp("", "markdown-post")
 		if err != nil {
 			fmt.Printf("Error creating temporary directory: %v\n", err)
 			return
@@ -251,7 +263,10 @@ func handlePost(input, confluenceURL, username, apiToken, spaceKey, title, paren
 			tempFile: title,
 		}
 
-		err = markdownconfluence.ConvertDirectory(tempDir, fileMapping, client)
+		options := markdownconfluence.DefaultConvertOptions()
+		options.DefaultSpaceKey = spaceKey
+
+		err = markdownconfluence.ConvertDirectoryWithOptions(tempDir, fileMapping, client, options, "DOCS")
 		if err != nil {
 			fmt.Printf("Error during conversion or posting: %v\n", err)
 			return
@@ -261,16 +276,61 @@ func handlePost(input, confluenceURL, username, apiToken, spaceKey, title, paren
 	}
 }
 
-func handleDirectory(dirPath, mappingPath, confluenceURL, username, apiToken, spaceKey string, dryRun bool) {
+func handleDirectory(dirPath, mappingPath, confluenceURL, username, apiToken, spaceKey string, dryRun bool, outputDir string) {
+	fmt.Println("Starting directory conversion process...")
+
 	if dirPath == "" {
 		fmt.Println("Error: Directory path is required")
 		return
+	}
+
+	// Get and display absolute path for the directory
+	absPath, err := filepath.Abs(dirPath)
+	if err != nil {
+		fmt.Printf("Warning: Failed to get absolute path: %v\n", err)
+	} else {
+		fmt.Printf("Processing directory: %s (resolved to: %s)\n", dirPath, absPath)
+	}
+
+	// Check if directory exists
+	dirInfo, err := os.Stat(dirPath)
+	if err != nil {
+		fmt.Printf("Error: Directory not accessible: %v\n", err)
+		return
+	}
+
+	if !dirInfo.IsDir() {
+		fmt.Printf("Error: Path is not a directory: %s\n", dirPath)
+		return
+	}
+
+	// List files in the directory
+	fmt.Println("Files in directory:")
+	files, err := os.ReadDir(dirPath)
+	if err != nil {
+		fmt.Printf("Error: Failed to read directory: %v\n", err)
+	} else {
+		for _, file := range files {
+			fmt.Printf("  - %s (isDir=%v)\n", file.Name(), file.IsDir())
+		}
+	}
+
+	// Check output directory
+	if dryRun && outputDir != "" {
+		if _, err := os.Stat(outputDir); os.IsNotExist(err) {
+			fmt.Printf("Creating output directory: %s\n", outputDir)
+			if err := os.MkdirAll(outputDir, 0755); err != nil {
+				fmt.Printf("Error: Failed to create output directory: %v\n", err)
+				return
+			}
+		}
 	}
 
 	if spaceKey == "" {
 		spaceKey = "DOCS"
 	}
 
+	// Create an explicit file mapping for all markdown files if no mapping provided
 	fileMapping := make(map[string]string)
 	if mappingPath != "" {
 		mappingFile, err := os.ReadFile(mappingPath)
@@ -284,17 +344,63 @@ func handleDirectory(dirPath, mappingPath, confluenceURL, username, apiToken, sp
 			fmt.Printf("Error: Failed to parse mapping file: %v\n", err)
 			return
 		}
+	} else {
+		// No mapping file provided, create mapping for all markdown files
+		err := filepath.Walk(dirPath, func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return fmt.Errorf("error accessing path %s: %w", path, err)
+			}
+
+			if info.IsDir() {
+				return nil
+			}
+
+			if filepath.Ext(path) == ".md" {
+				absPath, _ := filepath.Abs(path)
+				fileMapping[absPath] = absPath
+				fmt.Printf("Added to file mapping: %s\n", absPath)
+			}
+			return nil
+		})
+
+		if err != nil {
+			fmt.Printf("Error: Failed to walk directory: %v\n", err)
+			return
+		}
 	}
 
-	var client markdownconfluence.ConfluenceClient
+	fmt.Printf("File mapping contains %d entries\n", len(fileMapping))
+
+	// Ensure consistent usage of the ConfluenceAPI interface
+	var client confluence.ConfluenceAPI = confluence.NewConfluenceClient("", "", "")
 	if !dryRun && confluenceURL != "" && username != "" && apiToken != "" {
-		client = NewConfluenceClient(confluenceURL, username, apiToken)
+		client = confluence.NewConfluenceClient(confluenceURL, username, apiToken)
 	}
 
-	err := markdownconfluence.ConvertDirectory(dirPath, fileMapping, client)
+	options := markdownconfluence.DefaultConvertOptions()
+	options.DryRun = dryRun
+	options.OutputDirectory = outputDir
+	options.DefaultSpaceKey = spaceKey
+
+	fmt.Printf("Converting with options: DryRun=%v, OutputDirectory=%s\n", options.DryRun, options.OutputDirectory)
+
+	err = markdownconfluence.ConvertDirectoryWithOptions(dirPath, fileMapping, client, options, "DOCS")
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		return
+	}
+
+	// List files in output directory after conversion
+	if dryRun && outputDir != "" {
+		fmt.Println("Files in output directory after conversion:")
+		outFiles, err := os.ReadDir(outputDir)
+		if err != nil {
+			fmt.Printf("Error: Failed to read output directory: %v\n", err)
+		} else {
+			for _, file := range outFiles {
+				fmt.Printf("  - %s\n", file.Name())
+			}
+		}
 	}
 
 	fmt.Println("Conversion completed successfully")
@@ -304,11 +410,16 @@ func printHelp() {
 	fmt.Println("Markdown to Confluence Converter")
 	fmt.Println("--------------------------------")
 	fmt.Println("Usage:")
-	fmt.Println("  convert --input <markdown_or_file> [--output <file>]")
+	fmt.Println("  convert --input <markdown_or_file> [--output <file>] [--dry-run]")
 	fmt.Println("  post --input <markdown_or_file> --url <confluence_url> --username <username> --token <api_token> --space <space_key> --title <title> [--parent <parent_id>]")
-	fmt.Println("  directory --path <directory_path> [--mapping <mapping_file>] [--url <confluence_url> --username <username> --token <api_token> --space <space_key>] [--dry-run]")
+	fmt.Println("  directory --path <directory_path> [--mapping <mapping_file>] [--url <confluence_url> --username <username> --token <api_token> --space <space_key>] [--dry-run] [--output-directory <directory>]")
 	fmt.Println("  help, -help     Show this help message")
 	fmt.Println("  version, -version    Show version information")
+	fmt.Println()
+	fmt.Println("Options:")
+	fmt.Println("  --dry-run             Skip uploading to Confluence")
+	fmt.Println("  --output-directory    Directory to save converted JSON files when using --dry-run")
+	fmt.Println("                        Files will be saved in a structure mirroring the original paths")
 }
 
 func printVersion() {
@@ -318,15 +429,42 @@ func printVersion() {
 
 type OutputCapturer struct {
 	convertedMarkdown string
+	Output            []string // added field to capture output logs
 }
 
-func (c *OutputCapturer) CreatePage(spaceKey, title, content string, parentID string) (string, error) {
-	c.convertedMarkdown = content
-	return "dummy-page-id", nil
+// Add the missing CreateParentPage method to make OutputCapturer implement markdownconfluence.ConfluenceClient
+func (o *OutputCapturer) CreateParentPage(spaceKey, title, parentID string) (string, error) {
+	o.Output = append(o.Output, fmt.Sprintf("Would create parent page '%s' in space '%s' with parent ID: %s",
+		title, spaceKey, parentID))
+	return fmt.Sprintf("dummy-parent-page-id-%s", title), nil
+}
+
+// Make sure the CreatePage method signature matches the interface requirement
+func (o *OutputCapturer) CreatePage(spaceKey, title, content, parentID string) (string, error) {
+	// If this method already exists, ensure its signature matches exactly
+	o.Output = append(o.Output, fmt.Sprintf("Would create page '%s' in space '%s' with parent ID: %s",
+		title, spaceKey, parentID))
+	return fmt.Sprintf("dummy-page-id-%s", title), nil
 }
 
 func (c *OutputCapturer) UpdatePage(pageID, title, content, spaceKey string, version int) error {
 	c.convertedMarkdown = content
+	return nil
+}
+
+func (c *OutputCapturer) GetPageByTitle(spaceKey, title string) (*confluence.Page, error) {
+	return nil, nil
+}
+
+func (c *OutputCapturer) GetPageByID(pageID string) (*confluence.Page, error) {
+	return nil, nil
+}
+
+func (c *OutputCapturer) DeletePage(pageID string) error {
+	return nil
+}
+
+func (c *OutputCapturer) UploadAttachment(pageID, filePath string) error {
 	return nil
 }
 

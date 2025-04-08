@@ -1,0 +1,475 @@
+{
+  "type": "doc",
+  "content": [
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 1
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Tables and Task"
+        },
+        {
+          "type": "text",
+          "text": " Lists"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 2
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Tables"
+        },
+        {
+          "type": "text",
+          "text": "Header"
+        },
+        {
+          "type": "text",
+          "text": " 1"
+        },
+        {
+          "type": "text",
+          "text": "Header"
+        },
+        {
+          "type": "text",
+          "text": " 2"
+        },
+        {
+          "type": "text",
+          "text": "Header"
+        },
+        {
+          "type": "text",
+          "text": " 3"
+        },
+        {
+          "type": "text",
+          "text": "Row 1, Col"
+        },
+        {
+          "type": "text",
+          "text": " 1"
+        },
+        {
+          "type": "text",
+          "text": "Row 1, Col"
+        },
+        {
+          "type": "text",
+          "text": " 2"
+        },
+        {
+          "type": "text",
+          "text": "Row 1, Col"
+        },
+        {
+          "type": "text",
+          "text": " 3"
+        },
+        {
+          "type": "text",
+          "text": "Row 2, Col"
+        },
+        {
+          "type": "text",
+          "text": " 1"
+        },
+        {
+          "type": "text",
+          "text": "Row 2, Col"
+        },
+        {
+          "type": "text",
+          "text": " 2"
+        },
+        {
+          "type": "text",
+          "text": "Row 2, Col"
+        },
+        {
+          "type": "text",
+          "text": " 3"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 3
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Alignment in"
+        },
+        {
+          "type": "text",
+          "text": " Tables"
+        },
+        {
+          "type": "text",
+          "text": "Left-aligned"
+        },
+        {
+          "type": "text",
+          "text": "Center-aligned"
+        },
+        {
+          "type": "text",
+          "text": "Right-aligned"
+        },
+        {
+          "type": "text",
+          "text": "Left"
+        },
+        {
+          "type": "text",
+          "text": "Center"
+        },
+        {
+          "type": "text",
+          "text": "Right"
+        },
+        {
+          "type": "text",
+          "text": "Text"
+        },
+        {
+          "type": "text",
+          "text": "Text"
+        },
+        {
+          "type": "text",
+          "text": "Text"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 3
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Complex"
+        },
+        {
+          "type": "text",
+          "text": " Tables"
+        },
+        {
+          "type": "text",
+          "text": "Name"
+        },
+        {
+          "type": "text",
+          "text": "Description"
+        },
+        {
+          "type": "text",
+          "text": "Price"
+        },
+        {
+          "type": "text",
+          "text": "Item"
+        },
+        {
+          "type": "text",
+          "text": " 1"
+        },
+        {
+          "type": "text",
+          "text": "This is a description for item 1 that spans multiple"
+        },
+        {
+          "type": "text",
+          "text": " words"
+        },
+        {
+          "type": "text",
+          "text": "$10.00"
+        },
+        {
+          "type": "text",
+          "text": "Item"
+        },
+        {
+          "type": "text",
+          "text": " 2"
+        },
+        {
+          "type": "text",
+          "text": "This is a description for item"
+        },
+        {
+          "type": "text",
+          "text": " 2"
+        },
+        {
+          "type": "text",
+          "text": "$25.00"
+        },
+        {
+          "type": "text",
+          "text": "Item 3 with a long"
+        },
+        {
+          "type": "text",
+          "text": " name"
+        },
+        {
+          "type": "text",
+          "text": "Short"
+        },
+        {
+          "type": "text",
+          "text": " desc"
+        },
+        {
+          "type": "text",
+          "text": "$5.00"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 2
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Task"
+        },
+        {
+          "type": "text",
+          "text": " Lists"
+        }
+      ]
+    },
+    {
+      "type": "bulletList",
+      "attrs": {},
+      "content": [
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "text",
+              "text": "Completed"
+            },
+            {
+              "type": "text",
+              "text": " task"
+            }
+          ]
+        },
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "text",
+              "text": "Incomplete"
+            },
+            {
+              "type": "text",
+              "text": " task"
+            }
+          ]
+        },
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "text",
+              "text": "Task with ",
+              "marks": [
+                {
+                  "type": "strong"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "text": "formatted"
+            },
+            {
+              "type": "text",
+              "text": " ",
+              "marks": [
+                {
+                  "type": "em"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "text": "text"
+            }
+          ]
+        },
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "text",
+              "text": "Task with "
+            },
+            {
+              "type": "link",
+              "attrs": {
+                "href": "https://example.com"
+              },
+              "content": []
+            },
+            {
+              "type": "text",
+              "text": "link"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "bulletList",
+      "attrs": {},
+      "content": [
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "text",
+              "text": "Nested completed"
+            },
+            {
+              "type": "text",
+              "text": " task"
+            }
+          ]
+        },
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "text",
+              "text": "Nested incomplete"
+            },
+            {
+              "type": "text",
+              "text": " task"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 2
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Mixed Lists with"
+        },
+        {
+          "type": "text",
+          "text": " Tasks"
+        }
+      ]
+    },
+    {
+      "type": "orderedList",
+      "attrs": {},
+      "content": [
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "text",
+              "text": "First"
+            },
+            {
+              "type": "text",
+              "text": " item"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "bulletList",
+      "attrs": {},
+      "content": [
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "text",
+              "text": "Sub-task"
+            },
+            {
+              "type": "text",
+              "text": " completed"
+            }
+          ]
+        },
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "text",
+              "text": "Sub-task"
+            },
+            {
+              "type": "text",
+              "text": " pending"
+            }
+          ]
+        },
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "text",
+              "text": "Second"
+            },
+            {
+              "type": "text",
+              "text": " item"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "bulletList",
+      "attrs": {},
+      "content": [
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "text",
+              "text": "Another"
+            },
+            {
+              "type": "text",
+              "text": " sub-task"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

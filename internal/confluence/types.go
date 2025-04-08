@@ -185,3 +185,10 @@ type ADFPanel struct {
 type PanelAttrs struct {
 	PanelType string `json:"panelType"`
 }
+
+// Define the ConfluenceClient interface in the internal/confluence package to avoid circular dependencies
+type ConfluenceAPI interface {
+	CreatePage(spaceKey, title, content string, parentID string) (string, error)
+	UpdatePage(pageID, title, content, spaceKey string, version int) error
+	CreateParentPage(spaceKey, title, parentID string) (string, error)
+}

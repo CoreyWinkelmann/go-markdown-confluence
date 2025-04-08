@@ -26,16 +26,14 @@ func ConvertToADF(n ast.Node, source []byte) (*confluence.ADFDocument, error) {
 		if entering {
 			switch n.Kind() {
 			case ast.KindDocument:
-				// Nothing to do, we already created the document
 			default:
 				if n.Kind() == ast.KindText && len(n.Text(source)) == 0 {
-					return ast.WalkStop, fmt.Errorf("Invalid Markdown: Empty text node detected")
+					return ast.WalkContinue, nil
 				}
 			}
 
 			switch n.Kind() {
 			case ast.KindDocument:
-				// Nothing to do, we already created the document
 
 			case ast.KindHeading:
 				v := n.(*ast.Heading)
@@ -65,18 +63,14 @@ func ConvertToADF(n ast.Node, source []byte) (*confluence.ADFDocument, error) {
 
 			case ast.KindEmphasis:
 				v := n.(*ast.Emphasis)
-				// Create a text node with appropriate marks
-				// We'll add the actual text when we visit the child text nodes
 				markType := "strong"
 				if v.Level == 1 {
-					markType = "em" // italic
+					markType = "em"
 				}
 
-				// Create a placeholder that will be filled by child text nodes
 				parent := getCurrentParent(doc)
 				if parent != nil {
 					if textParent, ok := parent.(*confluence.ADFText); ok {
-						// Add mark to existing text
 						textParent.Marks = append(textParent.Marks, confluence.Mark{Type: markType})
 					}
 				}
@@ -119,7 +113,6 @@ func ConvertToADF(n ast.Node, source []byte) (*confluence.ADFDocument, error) {
 				}
 				doc.Content = append(doc.Content, codeBlock)
 
-				// For fenced code blocks, we need to extract and add the content
 				if fenced, ok := n.(*ast.FencedCodeBlock); ok {
 					lines := fenced.Lines()
 					var codeText strings.Builder
@@ -137,12 +130,9 @@ func ConvertToADF(n ast.Node, source []byte) (*confluence.ADFDocument, error) {
 				}
 
 			case ast.KindCodeSpan:
-				// Create a text node with code mark
-				// The actual text will be added when visiting child text nodes
 				parent := getCurrentParent(doc)
 				if parent != nil {
 					if textParent, ok := parent.(*confluence.ADFText); ok {
-						// Add code mark to existing text
 						textParent.Marks = append(textParent.Marks, confluence.Mark{Type: "code"})
 					}
 				}
@@ -166,7 +156,6 @@ func ConvertToADF(n ast.Node, source []byte) (*confluence.ADFDocument, error) {
 					Content: []interface{}{},
 				}
 
-				// Find the parent list
 				if len(doc.Content) > 0 {
 					if list, ok := doc.Content[len(doc.Content)-1].(*confluence.ADFList); ok {
 						list.Content = append(list.Content, listItem)
@@ -181,7 +170,6 @@ func ConvertToADF(n ast.Node, source []byte) (*confluence.ADFDocument, error) {
 
 			case ast.KindBlockquote:
 				v := n.(*ast.Blockquote)
-				// Detect info, warning, or error blocks based on the first text node
 				if child := v.FirstChild(); child != nil {
 					if textNode, ok := child.(*ast.Text); ok {
 						text := string(textNode.Segment.Value(source))
@@ -208,7 +196,6 @@ func ConvertToADF(n ast.Node, source []byte) (*confluence.ADFDocument, error) {
 					}
 				}
 
-				// Default blockquote handling if not a special panel
 				blockquote := &confluence.ADFBlockquote{
 					Type:    "blockquote",
 					Content: []interface{}{},
@@ -226,7 +213,7 @@ func ConvertToADF(n ast.Node, source []byte) (*confluence.ADFDocument, error) {
 	return doc, nil
 }
 
-// getCurrentParent returns the last content element that can contain child nodes
+// getCurrentParent returns the last content element that can contain child nodes.
 func getCurrentParent(doc *confluence.ADFDocument) interface{} {
 	if len(doc.Content) == 0 {
 		return nil
@@ -276,10 +263,9 @@ func getCurrentParent(doc *confluence.ADFDocument) interface{} {
 	return lastElem
 }
 
-// addToParent adds a node to the appropriate parent in the document
+// addToParent adds a node to the appropriate parent in the document.
 func addToParent(doc *confluence.ADFDocument, node interface{}) {
 	if len(doc.Content) == 0 {
-		// If there's no paragraph or other container yet, create one
 		paragraph := &confluence.ADFParagraph{
 			Type:    "paragraph",
 			Content: []interface{}{},
@@ -308,7 +294,6 @@ func addToParent(doc *confluence.ADFDocument, node interface{}) {
 			}
 		}
 	default:
-		// If we can't add to an existing element, create a paragraph
 		paragraph := &confluence.ADFParagraph{
 			Type:    "paragraph",
 			Content: []interface{}{node},
@@ -317,7 +302,7 @@ func addToParent(doc *confluence.ADFDocument, node interface{}) {
 	}
 }
 
-// SerializeToJSON converts an ADFDocument to its JSON representation
+// SerializeToJSON converts an ADFDocument to its JSON representation.
 func SerializeToJSON(doc *confluence.ADFDocument) (string, error) {
 	bytes, err := json.MarshalIndent(doc, "", "  ")
 	if err != nil {
