@@ -11,7 +11,8 @@ import (
 
 // MarkdownParser handles parsing of markdown content
 type MarkdownParser struct {
-	parser parser.Parser
+	parser   parser.Parser
+	markdown goldmark.Markdown
 }
 
 // NewMarkdownParser creates a new MarkdownParser instance
@@ -21,26 +22,27 @@ func NewMarkdownParser() *MarkdownParser {
 		parser.WithInlineParsers(parser.DefaultInlineParsers()...),
 	)
 
+	md := goldmark.New(
+		goldmark.WithExtensions(
+			extension.GFM,
+		),
+		goldmark.WithParser(p),
+	)
+
 	return &MarkdownParser{
-		parser: p,
+		parser:   p,
+		markdown: md,
 	}
 }
 
-// Remove debug logging for AST parsing
+// Parse parses the given markdown string into an AST
 func (mp *MarkdownParser) Parse(markdown string) ast.Node {
 	if len(markdown) == 0 {
 		return nil
 	}
 
-	md := goldmark.New(
-		goldmark.WithExtensions(
-			extension.GFM,
-		),
-		goldmark.WithParser(mp.parser),
-	)
-
 	reader := text.NewReader([]byte(markdown))
-	astRoot := md.Parser().Parse(reader)
+	astRoot := mp.markdown.Parser().Parse(reader)
 
 	return astRoot
 }
