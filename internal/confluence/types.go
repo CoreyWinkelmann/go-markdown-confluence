@@ -186,9 +186,45 @@ type PanelAttrs struct {
 	PanelType string `json:"panelType"`
 }
 
+// Add new types for emojis, placeholders, task lists, and decision items
+
+type ADFEmoji struct {
+	Type  string     `json:"type"`
+	Attrs EmojiAttrs `json:"attrs"`
+}
+
+type EmojiAttrs struct {
+	ShortName string `json:"shortName"`
+}
+
+type ADFPlaceholder struct {
+	Type  string           `json:"type"`
+	Attrs PlaceholderAttrs `json:"attrs"`
+}
+
+type PlaceholderAttrs struct {
+	Text string `json:"text"`
+}
+
+type ADFTaskList struct {
+	Type    string        `json:"type"`
+	Content []interface{} `json:"content"`
+}
+
+type ADFDecisionItem struct {
+	Type  string            `json:"type"`
+	Attrs DecisionItemAttrs `json:"attrs"`
+}
+
+type DecisionItemAttrs struct {
+	State string `json:"state"`
+}
+
 // Define the ConfluenceClient interface in the internal/confluence package to avoid circular dependencies
 type ConfluenceAPI interface {
 	CreatePage(spaceKey, title, content string, parentID string) (string, error)
 	UpdatePage(pageID, title, content, spaceKey string, version int) error
 	CreateParentPage(spaceKey, title, parentID string) (string, error)
+	// GetPageByTitle retrieves a page by its title in the specified space.
+	GetPageByTitle(spaceKey, title string) (*Page, error)
 }

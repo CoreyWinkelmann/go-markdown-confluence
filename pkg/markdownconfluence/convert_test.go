@@ -70,3 +70,44 @@ func TestConvert(t *testing.T) {
 		assert.NoError(t, err)
 	})
 }
+
+// Use JSONEq for JSON comparison to ignore formatting differences
+func TestConvertToADFWithNewFeatures(t *testing.T) {
+	cases := []struct {
+		name     string
+		markdown string
+		expected string
+	}{
+		{
+			name:     "Emoji",
+			markdown: ":smile:",
+			expected: `{"type":"doc","content":[{"type":"emoji","attrs":{"shortName":":smile:"}}]}`,
+		},
+		{
+			name:     "Placeholder",
+			markdown: "<div>placeholder</div>",
+			expected: `{"type":"doc","content":[{"type":"placeholder","attrs":{"text":"Add your content here"}}]}`,
+		},
+		{
+			name:     "Task List",
+			markdown: "- [ ] Task 1\n- [x] Task 2",
+			expected: `{"type":"doc","content":[{"type":"taskList","content":[]}]}`,
+		},
+		{
+			name:     "Decision Item",
+			markdown: "> Decision: Approve the proposal",
+			expected: `{"type":"doc","content":[{"type":"decisionItem","attrs":{"state":"DECIDED"}}]}`,
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			result, err := Convert(c.markdown)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+
+			assert.JSONEq(t, c.expected, result, "JSON output mismatch for %s", c.name)
+		})
+	}
+}

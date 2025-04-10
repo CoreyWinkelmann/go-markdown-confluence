@@ -384,6 +384,36 @@ func handleDirectory(dirPath, mappingPath, confluenceURL, username, apiToken, sp
 
 	fmt.Printf("Converting with options: DryRun=%v, OutputDirectory=%s\n", options.DryRun, options.OutputDirectory)
 
+	for oldPath, newTitle := range fileMapping {
+		if !dryRun {
+			// Check if a page with the old title exists
+			oldTitle := filepath.Base(oldPath)
+			page, err := client.GetPageByTitle(spaceKey, oldTitle)
+			if err != nil {
+				fmt.Printf("Error checking for existing page: %v\n", err)
+				continue
+			}
+
+			if page != nil {
+				// Update the page title and parent if it exists
+				fmt.Printf("Updating page '%s' to new title '%s'\n", oldTitle, newTitle)
+				err = client.UpdatePage(page.ID, newTitle, page.Body.Storage.Value, spaceKey, page.Version.Number+1)
+				if err != nil {
+					fmt.Printf("Error updating page: %v\n", err)
+					continue
+				}
+			} else {
+				// Create a new page if it doesn't exist
+				fmt.Printf("Creating new page '%s'\n", newTitle)
+				_, err = client.CreatePage(spaceKey, newTitle, "", "")
+				if err != nil {
+					fmt.Printf("Error creating page: %v\n", err)
+					continue
+				}
+			}
+		}
+	}
+
 	err = markdownconfluence.ConvertDirectoryWithOptions(dirPath, fileMapping, client, options, "DOCS")
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)

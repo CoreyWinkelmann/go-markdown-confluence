@@ -55,11 +55,22 @@ func ConvertToADF(n ast.Node, source []byte) (*confluence.ADFDocument, error) {
 
 			case ast.KindText:
 				v := n.(*ast.Text)
-				text := &confluence.ADFText{
-					Type: "text",
-					Text: string(v.Segment.Value(source)),
+				text := string(v.Segment.Value(source))
+				if strings.HasPrefix(text, ":") && strings.HasSuffix(text, ":") {
+					emoji := &confluence.ADFEmoji{
+						Type: "emoji",
+						Attrs: confluence.EmojiAttrs{
+							ShortName: text,
+						},
+					}
+					addToParent(doc, emoji)
+				} else {
+					textNode := &confluence.ADFText{
+						Type: "text",
+						Text: text,
+					}
+					addToParent(doc, textNode)
 				}
-				addToParent(doc, text)
 
 			case ast.KindEmphasis:
 				v := n.(*ast.Emphasis)
@@ -137,8 +148,31 @@ func ConvertToADF(n ast.Node, source []byte) (*confluence.ADFDocument, error) {
 					}
 				}
 
+			// Ensure no additional paragraph content is added for task lists and decision items
 			case ast.KindList:
 				v := n.(*ast.List)
+				isTaskList := false
+				for child := v.FirstChild(); child != nil; child = child.NextSibling() {
+					if item, ok := child.(*ast.ListItem); ok {
+						if item.FirstChild() != nil {
+							text := string(item.FirstChild().Text(source))
+							if len(text) > 0 && (text[0] == '[' && (text[1] == ' ' || text[1] == 'x') && text[2] == ']') {
+								isTaskList = true
+								break
+							}
+						}
+					}
+				}
+
+				if isTaskList {
+					taskList := &confluence.ADFTaskList{
+						Type:    "taskList",
+						Content: []interface{}{},
+					}
+					doc.Content = append(doc.Content, taskList)
+					return ast.WalkSkipChildren, nil // Ensure proper return values
+				}
+
 				listType := "bulletList"
 				if v.IsOrdered() {
 					listType = "orderedList"
@@ -149,6 +183,7 @@ func ConvertToADF(n ast.Node, source []byte) (*confluence.ADFDocument, error) {
 					Content: []interface{}{},
 				}
 				doc.Content = append(doc.Content, list)
+				return ast.WalkContinue, nil // Ensure proper return values
 
 			case ast.KindListItem:
 				listItem := &confluence.ADFListItem{
@@ -170,30 +205,15 @@ func ConvertToADF(n ast.Node, source []byte) (*confluence.ADFDocument, error) {
 
 			case ast.KindBlockquote:
 				v := n.(*ast.Blockquote)
-				if child := v.FirstChild(); child != nil {
-					if textNode, ok := child.(*ast.Text); ok {
-						text := string(textNode.Segment.Value(source))
-						panelType := ""
-						if strings.HasPrefix(strings.ToLower(text), "**info:**") {
-							panelType = "info"
-						} else if strings.HasPrefix(strings.ToLower(text), "**warning:**") {
-							panelType = "warning"
-						} else if strings.HasPrefix(strings.ToLower(text), "**error:**") {
-							panelType = "error"
-						}
-
-						if panelType != "" {
-							panel := &confluence.ADFPanel{
-								Type: "panel",
-								Attrs: confluence.PanelAttrs{
-									PanelType: panelType,
-								},
-								Content: []interface{}{},
-							}
-							doc.Content = append(doc.Content, panel)
-							return ast.WalkSkipChildren, nil
-						}
+				if strings.HasPrefix(strings.ToLower(string(v.Text(source))), "decision:") {
+					decision := &confluence.ADFDecisionItem{
+						Type: "decisionItem",
+						Attrs: confluence.DecisionItemAttrs{
+							State: "DECIDED",
+						},
 					}
+					doc.Content = append(doc.Content, decision)
+					return ast.WalkSkipChildren, nil // Ensure proper return values
 				}
 
 				blockquote := &confluence.ADFBlockquote{
@@ -201,6 +221,19 @@ func ConvertToADF(n ast.Node, source []byte) (*confluence.ADFDocument, error) {
 					Content: []interface{}{},
 				}
 				doc.Content = append(doc.Content, blockquote)
+				return ast.WalkContinue, nil // Ensure proper return values
+
+			case ast.KindHTMLBlock:
+				v := n.(*ast.HTMLBlock)
+				if strings.Contains(string(v.Text(source)), "placeholder") {
+					placeholder := &confluence.ADFPlaceholder{
+						Type: "placeholder",
+						Attrs: confluence.PlaceholderAttrs{
+							Text: "Add your content here",
+						},
+					}
+					addToParent(doc, placeholder)
+				}
 			}
 		}
 		return ast.WalkContinue, nil
@@ -263,8 +296,21 @@ func getCurrentParent(doc *confluence.ADFDocument) interface{} {
 	return lastElem
 }
 
-// addToParent adds a node to the appropriate parent in the document.
+// Prevent adding empty paragraphs and redundant content
 func addToParent(doc *confluence.ADFDocument, node interface{}) {
+	// Directly add standalone elements without wrapping
+	switch node.(type) {
+	case *confluence.ADFEmoji, *confluence.ADFPlaceholder, *confluence.ADFTaskList, *confluence.ADFDecisionItem:
+		if len(doc.Content) > 0 {
+			// Remove the last element if it's an empty paragraph
+			if lastElem, ok := doc.Content[len(doc.Content)-1].(*confluence.ADFParagraph); ok && len(lastElem.Content) == 0 {
+				doc.Content = doc.Content[:len(doc.Content)-1]
+			}
+		}
+		doc.Content = append(doc.Content, node)
+		return
+	}
+
 	if len(doc.Content) == 0 {
 		paragraph := &confluence.ADFParagraph{
 			Type:    "paragraph",

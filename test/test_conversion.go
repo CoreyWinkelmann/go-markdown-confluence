@@ -5,6 +5,7 @@ import (
 	"go-markdown-confluence/pkg/markdownconfluence"
 	"os"
 	"path/filepath"
+	"testing"
 )
 
 func main() {
@@ -64,5 +65,29 @@ func main() {
 		os.Exit(1)
 	} else {
 		fmt.Println("All files processed successfully.")
+	}
+}
+
+// Add integration tests for new ADF features
+func TestIntegrationWithNewADFFeatures(t *testing.T) {
+	markdown := `# Test Document\n\n:smile:\n\n<div>placeholder</div>\n\n- [ ] Task 1\n- [x] Task 2\n\n> Decision: Approve the proposal`
+	expected := `{
+		"type": "doc",
+		"content": [
+			{"type": "heading", "attrs": {"level": 1}, "content": [{"type": "text", "text": "Test Document"}]},
+			{"type": "emoji", "attrs": {"shortName": ":smile:"}},
+			{"type": "placeholder", "attrs": {"text": "Add your content here"}},
+			{"type": "taskList", "content": []},
+			{"type": "decisionItem", "attrs": {"state": "DECIDED"}}
+		]
+	}`
+
+	result, err := markdownconfluence.Convert(markdown)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if result != expected {
+		t.Errorf("expected %s, got %s", expected, result)
 	}
 }
