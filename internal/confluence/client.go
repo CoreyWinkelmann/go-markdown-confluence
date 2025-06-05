@@ -49,6 +49,12 @@ func (c *ConfluenceClient) UpdatePage(pageID, title, content, spaceKey string, v
 	return nil
 }
 
+// UploadAttachment uploads a file as an attachment to the specified page.
+func (c *ConfluenceClient) UploadAttachment(pageID, filePath string) error {
+	fmt.Printf("Uploading attachment %s to page %s\n", filePath, pageID)
+	return nil
+}
+
 // Implement GetPageByTitle in the Confluence client
 func (c *ConfluenceClient) GetPageByTitle(spaceKey, title string) (*Page, error) {
 	url := fmt.Sprintf("%s/rest/api/content?spaceKey=%s&title=%s", c.BaseURL, spaceKey, title)

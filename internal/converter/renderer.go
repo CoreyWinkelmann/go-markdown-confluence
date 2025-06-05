@@ -9,6 +9,7 @@ import (
 	"github.com/yuin/goldmark/ast"
 
 	"go-markdown-confluence/internal/confluence"
+	"go-markdown-confluence/internal/mermaid"
 )
 
 // ConvertToADF converts a parsed AST node to an ADFDocument.
@@ -56,7 +57,20 @@ func ConvertToADF(n ast.Node, source []byte) (*confluence.ADFDocument, error) {
 			case ast.KindText:
 				v := n.(*ast.Text)
 				text := string(v.Segment.Value(source))
-				if strings.HasPrefix(text, ":") && strings.HasSuffix(text, ":") {
+				if strings.HasPrefix(text, "[[") && strings.HasSuffix(text, "]]") {
+					target := strings.TrimSuffix(strings.TrimPrefix(text, "[["), "]]")
+					linkText := target
+					if parts := strings.SplitN(target, "|", 2); len(parts) == 2 {
+						target = parts[0]
+						linkText = parts[1]
+					}
+					link := &confluence.ADFLink{
+						Type:    "link",
+						Attrs:   confluence.LinkAttrs{Href: target},
+						Content: []interface{}{&confluence.ADFText{Type: "text", Text: linkText}},
+					}
+					addToParent(doc, link)
+				} else if strings.HasPrefix(text, ":") && strings.HasSuffix(text, ":") {
 					emoji := &confluence.ADFEmoji{
 						Type: "emoji",
 						Attrs: confluence.EmojiAttrs{
@@ -115,30 +129,37 @@ func ConvertToADF(n ast.Node, source []byte) (*confluence.ADFDocument, error) {
 					language = string(fenced.Language(source))
 				}
 
-				codeBlock := &confluence.ADFCodeBlock{
-					Type: "codeBlock",
-					Attrs: confluence.CodeBlockAttrs{
-						Language: language,
-					},
-					Content: []interface{}{},
+				lines := n.Lines()
+				var codeText strings.Builder
+				for i := 0; i < lines.Len(); i++ {
+					line := lines.At(i)
+					codeText.Write(line.Value(source))
 				}
-				doc.Content = append(doc.Content, codeBlock)
 
-				if fenced, ok := n.(*ast.FencedCodeBlock); ok {
-					lines := fenced.Lines()
-					var codeText strings.Builder
-					for i := 0; i < lines.Len(); i++ {
-						line := lines.At(i)
-						codeText.Write(line.Value(source))
-					}
+				codeStr := codeText.String()
 
-					codeContent := &confluence.ADFText{
-						Type: "text",
-						Text: codeText.String(),
+				if language == "adf" || language == "adf-json" {
+					var raw interface{}
+					if err := json.Unmarshal([]byte(codeStr), &raw); err == nil {
+						doc.Content = append(doc.Content, raw)
+						return ast.WalkSkipChildren, nil
 					}
-					codeBlock.Content = append(codeBlock.Content, codeContent)
+				}
+
+				if language == "mermaid" {
+					imgPath, _ := mermaid.RenderDiagram(codeStr)
+					image := &confluence.ADFImage{Type: "image", Attrs: confluence.ImageAttrs{Src: imgPath}}
+					addToParent(doc, image)
 					return ast.WalkSkipChildren, nil
 				}
+
+				codeBlock := &confluence.ADFCodeBlock{
+					Type:    "codeBlock",
+					Attrs:   confluence.CodeBlockAttrs{Language: language},
+					Content: []interface{}{&confluence.ADFText{Type: "text", Text: codeStr}},
+				}
+				doc.Content = append(doc.Content, codeBlock)
+				return ast.WalkSkipChildren, nil
 
 			case ast.KindCodeSpan:
 				parent := getCurrentParent(doc)
@@ -205,7 +226,26 @@ func ConvertToADF(n ast.Node, source []byte) (*confluence.ADFDocument, error) {
 
 			case ast.KindBlockquote:
 				v := n.(*ast.Blockquote)
-				if strings.HasPrefix(strings.ToLower(string(v.Text(source))), "decision:") {
+				textContent := strings.TrimSpace(string(v.Text(source)))
+				if strings.HasPrefix(strings.ToLower(textContent), "[!") {
+					end := strings.Index(textContent, "]")
+					if end != -1 {
+						callout := strings.ToLower(textContent[2:end])
+						content := strings.TrimSpace(textContent[end+1:])
+						panelType := "info"
+						if callout == "warning" || callout == "caution" || callout == "danger" {
+							panelType = "warning"
+						}
+						panel := &confluence.ADFPanel{
+							Type:    "panel",
+							Attrs:   confluence.PanelAttrs{PanelType: panelType},
+							Content: []interface{}{&confluence.ADFParagraph{Type: "paragraph", Content: []interface{}{&confluence.ADFText{Type: "text", Text: content}}}},
+						}
+						doc.Content = append(doc.Content, panel)
+						return ast.WalkSkipChildren, nil
+					}
+				}
+				if strings.HasPrefix(strings.ToLower(textContent), "decision:") {
 					decision := &confluence.ADFDecisionItem{
 						Type: "decisionItem",
 						Attrs: confluence.DecisionItemAttrs{

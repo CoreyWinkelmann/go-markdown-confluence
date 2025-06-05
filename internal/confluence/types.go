@@ -227,4 +227,6 @@ type ConfluenceAPI interface {
 	CreateParentPage(spaceKey, title, parentID string) (string, error)
 	// GetPageByTitle retrieves a page by its title in the specified space.
 	GetPageByTitle(spaceKey, title string) (*Page, error)
+	// UploadAttachment uploads a file as an attachment to the specified page.
+	UploadAttachment(pageID, filePath string) error
 }

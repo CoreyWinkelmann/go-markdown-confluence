@@ -495,6 +495,7 @@ func (c *OutputCapturer) DeletePage(pageID string) error {
 }
 
 func (c *OutputCapturer) UploadAttachment(pageID, filePath string) error {
+	c.Output = append(c.Output, fmt.Sprintf("Would upload attachment %s to page %s", filePath, pageID))
 	return nil
 }
 
