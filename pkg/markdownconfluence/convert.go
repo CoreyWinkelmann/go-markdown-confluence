@@ -3,11 +3,15 @@ package markdownconfluence
 
 import (
 	"fmt"
+	"regexp"
+	"strings"
+
+	"go-markdown-confluence/internal/confluence"
 	"go-markdown-confluence/internal/converter"
 	"go-markdown-confluence/internal/parser"
+	"gopkg.in/yaml.v3"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 // ConfluenceClient defines the interface that any Confluence client must implement.
@@ -16,19 +20,81 @@ type ConfluenceClient interface {
 	CreateParentPage(spaceKey, title, parentID string) (string, error)
 	// CreatePage creates a page in Confluence.
 	CreatePage(spaceKey, title, content, parentID string) (string, error)
+	// UpdatePage updates an existing page in Confluence.
+	UpdatePage(pageID, title, content, spaceKey string, version int) error
+	// GetPageByTitle retrieves a page by its title.
+	GetPageByTitle(spaceKey, title string) (*confluence.Page, error)
+	// UploadAttachment uploads an attachment to the given page and returns the attachment ID or URL.
+	UploadAttachment(pageID, filePath string) error
 }
 
 // ConversionResult holds the result of a Markdown file conversion.
 type ConversionResult struct {
-	FilePath         string // Original Markdown file path
-	Title            string // Page title derived from filename
-	ConvertedContent string // Converted content in ADF JSON format
-	TargetPath       string // Target path after applying mapping
+	FilePath         string   // Original Markdown file path
+	Title            string   // Page title derived from filename
+	ConvertedContent string   // Converted content in ADF JSON format
+	TargetPath       string   // Target path after applying mapping
+	ImagePaths       []string // Paths to image files referenced in the Markdown
+	PageID           string   // Existing Confluence page ID for updates
 }
 
 // Convert takes a Markdown string and converts it to a Confluence-compatible format.
 // If the input is an empty string, it returns an empty string without error.
+func stripObsidianComments(markdown string) string {
+	re := regexp.MustCompile(`%%.*?%%`)
+	return re.ReplaceAllString(markdown, "")
+}
+
+func replaceWikiLinks(markdown string) string {
+	re := regexp.MustCompile(`\[\[(.*?)\]\]`)
+	return re.ReplaceAllStringFunc(markdown, func(m string) string {
+		match := re.FindStringSubmatch(m)
+		if len(match) < 2 {
+			return m
+		}
+		inner := match[1]
+		escaped := strings.ReplaceAll(inner, " ", "%20")
+		return "[" + inner + "](" + escaped + ")"
+	})
+}
+
+func extractImagePaths(markdown string) []string {
+	re := regexp.MustCompile(`!\[[^\]]*\]\(([^)]+)\)`)
+	matches := re.FindAllStringSubmatch(markdown, -1)
+	var paths []string
+	for _, m := range matches {
+		if len(m) > 1 {
+			paths = append(paths, m[1])
+		}
+	}
+	return paths
+}
+
+func extractFrontmatter(markdown string) (map[string]interface{}, string) {
+	if !strings.HasPrefix(markdown, "---") {
+		return nil, markdown
+	}
+
+	end := strings.Index(markdown[3:], "---")
+	if end == -1 {
+		return nil, markdown
+	}
+
+	front := markdown[3 : 3+end]
+	body := markdown[3+end+3:]
+
+	m := make(map[string]interface{})
+	if err := yaml.Unmarshal([]byte(front), &m); err != nil {
+		return nil, markdown
+	}
+
+	return m, strings.TrimLeft(body, "\n")
+}
+
 func Convert(markdown string) (string, error) {
+	markdown = stripObsidianComments(markdown)
+	markdown = replaceWikiLinks(markdown)
+
 	for _, r := range markdown {
 		if r == '\x00' {
 			return "", fmt.Errorf("invalid Markdown: contains null character")
@@ -117,12 +183,16 @@ func ConvertDirectoryWithResults(dirPath string, fileMapping map[string]string, 
 
 	// Process each markdown file
 	for _, path := range markdownFiles {
-		content, err := os.ReadFile(path)
+		contentBytes, err := os.ReadFile(path)
 		if err != nil {
 			return nil, fmt.Errorf("failed to read file %s: %w", path, err)
 		}
 
-		confluenceContent, err := Convert(string(content))
+		fm, body := extractFrontmatter(string(contentBytes))
+		imagePaths := extractImagePaths(body)
+		pageID, _ := fm["connie-page-id"].(string)
+
+		confluenceContent, err := Convert(body)
 		if err != nil {
 			return nil, fmt.Errorf("failed to convert file %s: %w", path, err)
 		}
@@ -134,6 +204,9 @@ func ConvertDirectoryWithResults(dirPath string, fileMapping map[string]string, 
 
 		title := filepath.Base(targetPath)
 		title = title[:len(title)-len(filepath.Ext(title))]
+		if v, ok := fm["connie-title"].(string); ok && v != "" {
+			title = v
+		}
 
 		// Add result to the collection
 		results = append(results, ConversionResult{
@@ -141,6 +214,8 @@ func ConvertDirectoryWithResults(dirPath string, fileMapping map[string]string, 
 			Title:            title,
 			ConvertedContent: confluenceContent,
 			TargetPath:       targetPath,
+			ImagePaths:       imagePaths,
+			PageID:           pageID,
 		})
 
 		// Save converted content to file if in dry run mode with output directory specified
@@ -243,9 +318,24 @@ func ConvertDirectoryWithOptions(dirPath string, fileMapping map[string]string, 
 			currentParentID = pageID
 		}
 
-		_, err = confluenceClient.CreatePage(spaceKey, result.Title, result.ConvertedContent, currentParentID)
-		if err != nil {
-			return fmt.Errorf("failed to upload file %s to Confluence: %w", result.FilePath, err)
+		pageID := result.PageID
+		if pageID != "" {
+			err = confluenceClient.UpdatePage(pageID, result.Title, result.ConvertedContent, spaceKey, 1)
+			if err != nil {
+				return fmt.Errorf("failed to update page %s: %w", pageID, err)
+			}
+		} else {
+			pageID, err = confluenceClient.CreatePage(spaceKey, result.Title, result.ConvertedContent, currentParentID)
+			if err != nil {
+				return fmt.Errorf("failed to upload file %s to Confluence: %w", result.FilePath, err)
+			}
+		}
+
+		for _, img := range result.ImagePaths {
+			absPath := filepath.Join(filepath.Dir(result.FilePath), img)
+			if err := confluenceClient.UploadAttachment(pageID, absPath); err != nil {
+				return fmt.Errorf("failed to upload attachment %s: %w", absPath, err)
+			}
 		}
 	}
 	return nil

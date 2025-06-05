@@ -1,6 +1,8 @@
 package markdownconfluence
 
 import (
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -98,6 +100,26 @@ func TestConvertToADFWithNewFeatures(t *testing.T) {
 			markdown: "> Decision: Approve the proposal",
 			expected: `{"type":"doc","content":[{"type":"decisionItem","attrs":{"state":"DECIDED"}}]}`,
 		},
+		{
+			name:     "Callout",
+			markdown: "> [!note] important info",
+			expected: `{"type":"doc","content":[{"type":"panel","attrs":{"panelType":"info"},"content":[{"type":"paragraph","content":[{"type":"text","text":"important info"}]}]}]}`,
+		},
+		{
+			name:     "WikiLink",
+			markdown: "[[Page Title]]",
+			expected: `{"type":"doc","content":[{"type":"paragraph","content":[{"type":"link","attrs":{"href":"Page%20Title"},"content":[]},{"type":"text","text":"Page Title"}]}]}`,
+		},
+		{
+			name:     "Raw ADF",
+			markdown: "```adf\n{\"type\":\"rule\"}\n```",
+			expected: `{"type":"doc","content":[{"type":"rule"}]}`,
+		},
+		{
+			name:     "Mermaid",
+			markdown: "```mermaid\nflowchart TD; A-->B\n```",
+			expected: `{"type":"doc","content":[{"type":"image","attrs":{"src":""}}]}`,
+		},
 	}
 
 	for _, c := range cases {
@@ -107,7 +129,30 @@ func TestConvertToADFWithNewFeatures(t *testing.T) {
 				t.Fatalf("unexpected error: %v", err)
 			}
 
+			if c.name == "Mermaid" {
+				assert.Contains(t, result, "\"image\"")
+				return
+			}
+
 			assert.JSONEq(t, c.expected, result, "JSON output mismatch for %s", c.name)
 		})
+	}
+}
+
+func TestExtractImagePaths(t *testing.T) {
+	md := "![](image.png)\n![alt](pics/photo.jpg)"
+	paths := extractImagePaths(md)
+	assert.Equal(t, []string{"image.png", "pics/photo.jpg"}, paths)
+}
+
+func TestConvertDirectoryWithResults_ImagePaths(t *testing.T) {
+	dir := t.TempDir()
+	md := "![](img.png)"
+	os.WriteFile(filepath.Join(dir, "file.md"), []byte(md), 0644)
+
+	results, err := ConvertDirectoryWithResults(dir, nil, nil)
+	assert.NoError(t, err)
+	if assert.Len(t, results, 1) {
+		assert.Equal(t, []string{"img.png"}, results[0].ImagePaths)
 	}
 }
